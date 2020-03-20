@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 
+import android.content.Intent;
 import android.os.Environment;
 import	android.provider.MediaStore;
 
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button shot;
     private Button save;
     private String path;
-    private Bitmap shotWeb;
+    public static Bitmap shotWeb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +44,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         shot.setOnClickListener(this);
         save.setOnClickListener(this);
         mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.setInitialScale(90);
         mWebView.setWebViewClient(new WebViewClient());
-        mWebView.loadUrl("https://github.com");
+        mWebView.loadUrl("http://map.dedsec.site");
 
 
 
@@ -55,11 +57,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()){
             case R.id.ask:
                 askPermissions();
+                break;
             case R.id.shot:
                 shotWeb=ShotWeb();
+                Intent intent=new Intent(MainActivity.this,ShowActivity.class);
+                startActivity(intent);
                 break;
             case R.id.save:
-                save(shotWeb);
+                Intent intent2=new Intent(MainActivity.this,SaveImageActivity.class);
+                startActivity(intent2);
                 break;
             default:
                 break;
@@ -73,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         File directory = new File(path);
         File file;
         directory.mkdirs();
-        file = new File(directory,"web.jpg");
+        file = new File(directory,"\\web.jpg");
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
 
