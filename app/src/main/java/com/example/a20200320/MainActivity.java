@@ -17,13 +17,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.muddzdev.quickshot.QuickShot;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private WebView mWebView;
+    private Button ask;
+    private Button shot;
+    private Button save;
+    private String path;
     private Bitmap shotWeb;
 
     @Override
@@ -31,15 +36,53 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mWebView=(WebView)findViewById(R.id.mWeb);
+        ask=(Button)findViewById(R.id.ask);
+        shot=(Button)findViewById(R.id.shot);
+        save=(Button)findViewById(R.id.save) ;
+        ask.setOnClickListener(this);
+        shot.setOnClickListener(this);
+        save.setOnClickListener(this);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new WebViewClient());
-        mWebView.loadUrl("http://www.baidu.com");
-        askPermissions();
-        shotWeb=ShotWeb();
-        saveImageToGallery(shotWeb);
+        mWebView.loadUrl("https://github.com");
+
+
 
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.ask:
+                askPermissions();
+            case R.id.shot:
+                shotWeb=ShotWeb();
+                break;
+            case R.id.save:
+                save(shotWeb);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void save(Bitmap bitmap) {
+        if (path == null) {
+            path = Environment.getExternalStorageDirectory() + File.separator + Environment.DIRECTORY_PICTURES;
+        }
+        File directory = new File(path);
+        File file;
+        directory.mkdirs();
+        file = new File(directory,"web.jpg");
+        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(file))) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            bitmap.recycle();
+        }
+    }
 
     public void saveImageToGallery(Bitmap bitmap) {
         // 首先保存图片
