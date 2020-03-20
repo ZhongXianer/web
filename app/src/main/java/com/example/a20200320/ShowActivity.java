@@ -16,7 +16,7 @@ public class ShowActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show);
-        imageView=(ImageView)findViewById(R.id.image);
+        imageView= findViewById(R.id.image);
         Intent intent=getIntent();
         imageView.setImageBitmap(MainActivity.shotWeb);
         Toast.makeText(this,"success",Toast.LENGTH_SHORT).show();

@@ -6,7 +6,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Environment;
 import	android.provider.MediaStore;
 
@@ -32,6 +34,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String path;
     public static Bitmap shotWeb;
 
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {Manifest.permission.READ_EXTERNAL_STORAGE
+            ,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.ask:
-                askPermissions();
+                askPermissions(MainActivity.this);
                 break;
             case R.id.shot:
                 shotWeb=ShotWeb();
@@ -137,16 +144,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    private void askPermissions() {
-        int requestCode = 232;
-        String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PermissionChecker.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, permissions, requestCode);
-            }
+    public static void askPermissions(Activity activity) {
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
         }
+
     }
 
 
 
 }
+

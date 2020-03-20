@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -18,16 +19,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.UUID;
 
 import static com.example.a20200320.MainActivity.shotWeb;
 
 public class SaveImageActivity extends AppCompatActivity {
 
+    private static final String TAG = "Kuihua";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save_image);
-        Intent intent=getIntent();
+        MainActivity.askPermissions(SaveImageActivity.this);
         saveTempBitmap(shotWeb);
     }
 
@@ -41,22 +45,28 @@ public class SaveImageActivity extends AppCompatActivity {
     }
 
     private void saveImage(Bitmap finalBitmap) {
-        File file = new File(getExternalCacheDir(),"output_image.jpg");
-
-
-        if (file.exists()) file.delete ();
+        String dir=Environment.getExternalStorageDirectory().getAbsolutePath()+"/webshot";
+        String fileName= UUID.randomUUID().toString();
         try {
-            FileOutputStream out = new FileOutputStream(file);
+            File file=new File(dir);
+            if (!file.exists()){
+                boolean mkdir=file.mkdir();
+                if (mkdir)
+                    Log.d(TAG, "saveImage: 创建成功");
+                else Log.d(TAG, "saveImage: 创建失败");
+            }
+            FileOutputStream out = new FileOutputStream(dir+"/"+fileName+".jpg");
             finalBitmap.compress(Bitmap.CompressFormat.JPEG, 50, out);
-            out.flush();
             out.close();
+//            Uri uri=Uri.fromFile(file1);
+//            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE), String.valueOf(uri));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Toast.makeText(this,"saveOK",Toast.LENGTH_SHORT).show();
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-
-        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, new String[]{file.getName()}, null);
+//        Toast.makeText(this,"saveOK",Toast.LENGTH_SHORT).show();
+//        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
+//
+//        MediaScannerConnection.scanFile(this, new String[]{file.toString()}, new String[]{file.getName()}, null);
     }
 
     /* Checks if external storage is available for read and write */
